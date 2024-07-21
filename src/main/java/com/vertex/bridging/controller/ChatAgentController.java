@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/chat-agent")
+@RequestMapping(value = "/chat-agent", produces = "application/json")
 public class ChatAgentController {
 
     private final ChatAgentService chatAgentService;
