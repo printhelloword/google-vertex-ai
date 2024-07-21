@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/cloud-storages", produces = "application/json")
+@RequestMapping(value = "/storages", produces = "application/json")
 public class CloudStorageController {
 
     private final CloudStorageService cloudStorageService;
