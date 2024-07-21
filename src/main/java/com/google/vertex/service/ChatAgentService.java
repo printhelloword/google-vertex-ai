@@ -22,47 +22,25 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 public class ChatAgentService {
-    private final RestTemplate restTemplate = new RestTemplate();
+    public static final String TIMEZONE = "Asia/Bangkok";
     private final GoogleConsoleConfig googleConsoleConfig;
-    private final Gson gson;
-    /*private GoogleCredentials googleCredentials;*/
-    private final GoogleTokenHelper googleTokenHelper;
+    private final GoogleApiRestClient googleApiRestClient;
 
     public String getDialogFlowResponse(String input, String language) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + googleTokenHelper.getToken());
+        ChatAgentRequest chatAgentRequest = getChatAgentRequest(input, language);
+        String url = buildUrl();
+        log.info("generated service url: {}", url);
+        return googleApiRestClient.makeApiCall(url, HttpMethod.POST, chatAgentRequest);
+    }
 
+    private static ChatAgentRequest getChatAgentRequest(String input, String language) {
         Text text = new Text(input);
         QueryInput queryInput = new QueryInput(text, language);
-        QueryParams queryParams = new QueryParams("America/Los_Angeles");
-        ChatAgentRequest chatAgentRequest = new ChatAgentRequest(queryInput, queryParams);
-
-        String finalUrl = getDialogflowChatUrl();
-        log.info("generated url: {}", finalUrl);
-        HttpEntity<ChatAgentRequest> requestEntity = new HttpEntity<>(chatAgentRequest, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class);
-        /*ChatAgentResponse responseBody = response.getBody();
-        if (DialogFlowMatchType.NO_MATCH.name().equalsIgnoreCase(responseBody.getQueryResult().getMatch().getMatchType())) {
-            log.info("Query {} has NO MATCH", text);
-            return responseBody.getQueryResult().getMatch().getMatchType();
-        }*/
-        return response.getBody();
+        QueryParams queryParams = new QueryParams(TIMEZONE);
+        return new ChatAgentRequest(queryInput, queryParams);
     }
 
-    private String getAccessToken() throws IOException {
-        InputStream resource = new ClassPathResource(
-                "service-account.json").getInputStream();
-        GoogleCredentials credential = GoogleCredentials.fromStream(resource).createScoped(Arrays.asList(
-        "https://www.googleapis.com/auth/devstorage.full_control", "https://www.googleapis.com/auth/dialogflow"));
-        return credential.getAccessToken() != null ?
-                credential.getAccessToken().getTokenValue() :
-                credential.refreshAccessToken().getTokenValue();
-    }
-
-    private String getDialogflowChatUrl() {
+    private String buildUrl() {
         return "https://" + googleConsoleConfig.getRegionId() + "-dialogflow.googleapis.com/v3/projects/" + googleConsoleConfig.getProjectId() + "/locations/" + googleConsoleConfig.getRegionId() + "/agents/" + googleConsoleConfig.getAgentId() + "/sessions/" + UUID.randomUUID().toString().substring(0, 8) + ":detectIntent";
     }
 
