@@ -3,7 +3,6 @@ package com.vertex.bridging.helper;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -19,14 +18,11 @@ public class GoogleTokenHelper {
     private String token;
     private Date tokenExpiryTime;
 
-    private Resource googleConsoleCred;
+    private final Resource googleConsoleCred;
 
-    @Autowired
-    public GoogleTokenHelper(@Value("${google.console.cred}") Resource cred) {
+
+    public GoogleTokenHelper(@Value("${google.console.cred}") Resource cred) throws IOException {
         this.googleConsoleCred = cred;
-    }
-
-    public GoogleTokenHelper() throws IOException {
         refreshToken();
     }
 

@@ -6,7 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,14 +14,15 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 @Service
-public class GoogleApiRestClient<T> {
+public class GoogleApiRestClient {
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
     private final RestTemplate restTemplate;
     private final GoogleTokenHelper googleTokenHelper;
 
-    public String makeApiCall(String url, HttpMethod method, HttpEntity<?> requestEntity) throws IOException {
+    public String makeApiCall(String url, HttpMethod method, Object requestBody) throws IOException {
         HttpHeaders headers = getHttpHeaders();
+        HttpEntity<Object> requestEntity = new HttpEntity<>(requestBody, headers);
         requestEntity.getHeaders().forEach((key, value) -> headers.add(key, value.toString()));
 
         ResponseEntity<String> response = null;
