@@ -1,6 +1,6 @@
 package com.google.vertex.service;
 
-import com.google.vertex.helper.GoogleTokenHelper;
+import com.google.vertex.helper.GoogleCredentialHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
@@ -16,7 +16,7 @@ public class GoogleApiRestClient {
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
     private final RestTemplate restTemplate;
-    private final GoogleTokenHelper googleTokenHelper;
+    private final GoogleCredentialHelper googleCredentialHelper;
 
     public String makeApiCall(String url, HttpMethod method, Object requestBody) throws IOException {
         HttpHeaders headers = getHttpHeaders();
@@ -36,7 +36,7 @@ public class GoogleApiRestClient {
     private HttpHeaders getHttpHeaders() throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(AUTHORIZATION, BEARER + googleTokenHelper.getToken());
+        headers.set(AUTHORIZATION, BEARER + googleCredentialHelper.getToken());
         return headers;
     }
 

@@ -1,19 +1,14 @@
 package com.google.vertex.service;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.gson.Gson;
 import com.google.vertex.config.GoogleConsoleConfig;
 import com.google.vertex.dto.chatagent.request.ChatAgentRequest;
-import com.google.vertex.helper.GoogleTokenHelper;
 import com.google.vertex.dto.chatagent.request.QueryInput;
 import com.google.vertex.dto.chatagent.request.QueryParams;
 import com.google.vertex.dto.chatagent.request.Text;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.util.*;
