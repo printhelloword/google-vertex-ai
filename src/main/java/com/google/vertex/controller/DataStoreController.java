@@ -12,15 +12,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/data-storage")
+@RequestMapping(value = "/data-storage", produces = "application/json")
 public class DataStoreController {
 
     private final DataStoreService dataStoreService;
 
     @PostMapping()
-    public String uploadFile(@RequestParam("file") MultipartFile file) {
+    public String uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("bucket") String bucketName) {
         try {
-            return dataStoreService.uploadFile(file);
+            return dataStoreService.uploadToDataStore(file, bucketName);
         }catch (Exception e){
             log.info("Error : ", e);
         }
