@@ -1,6 +1,6 @@
 package com.google.vertex.config;
 
-import com.google.vertex.helper.GoogleTokenHelper;
+import com.google.vertex.helper.GoogleCredentialHelper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +21,9 @@ public class AppConfig {
     }
 
     @Bean
-    public GoogleTokenHelper googleTokenHelper(@Value("${google.console.cred}") Resource cred) throws IOException {
+    public GoogleCredentialHelper googleTokenHelper(@Value("${google.console.cred}") Resource cred) throws IOException {
         log.info("Init Singleton GoogleTokenHelper");
-        return new GoogleTokenHelper(cred);
+        return new GoogleCredentialHelper(cred);
     }
 
 }

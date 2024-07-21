@@ -1,6 +1,7 @@
 package com.google.vertex.helper;
 
 import com.google.auth.oauth2.GoogleCredentials;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,15 +14,18 @@ import java.util.Arrays;
 import java.util.Date;
 
 @Component
-public class GoogleTokenHelper {
-    private static final Logger log = LoggerFactory.getLogger(GoogleTokenHelper.class);
+public class GoogleCredentialHelper {
+    private static final Logger log = LoggerFactory.getLogger(GoogleCredentialHelper.class);
     private String token;
     private Date tokenExpiryTime;
 
     private final Resource googleConsoleCred;
 
+    @Getter
+    private GoogleCredentials credential;
 
-    public GoogleTokenHelper(@Value("${google.console.cred}") Resource cred) throws IOException {
+
+    public GoogleCredentialHelper(@Value("${google.console.cred}") Resource cred) throws IOException {
         this.googleConsoleCred = cred;
         refreshToken();
     }
@@ -43,7 +47,7 @@ public class GoogleTokenHelper {
     private void refreshToken() throws IOException {
         log.info("refreshing token");
         InputStream resource = googleConsoleCred.getInputStream();
-        GoogleCredentials credential = GoogleCredentials.fromStream(resource).createScoped(Arrays.asList(
+        credential = GoogleCredentials.fromStream(resource).createScoped(Arrays.asList(
                 "https://www.googleapis.com/auth/devstorage.full_control", "https://www.googleapis.com/auth/dialogflow"));
 
         credential.refreshIfExpired();
