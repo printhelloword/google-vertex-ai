@@ -7,7 +7,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -16,32 +15,10 @@ import java.io.*;
 @RequiredArgsConstructor
 @Service
 public class DataStoreService {
-    private final RestTemplate restTemplate = new RestTemplate();
     private final GoogleConsoleConfig googleConsoleConfig;
+    private final GoogleApiRestClient googleApiRestClient;
 
-    public String uploadFile(MultipartFile file) {
-        String response = "null";
-        try {
-            response = processRequest(file);
-        } catch (Exception e) {
-            log.info("Fail Make Google Api Call : {}", e);
-        }
-
-        return response;
-    }
-/*
-
-    public String importToMediaDataStore(MultipartFile file) {
-        String getImportIntoMediaDataStoreUrl();
-    }
-*/
-
-    private String processRequest(MultipartFile multipartFile) throws IOException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        String token = "static-token";
-        headers.set("Authorization", "Bearer " + token);
-
+    public String uploadToDataStore(MultipartFile multipartFile, String bucketName) throws IOException {
         File file = new File(multipartFile.getName());
 
         try (OutputStream os = new FileOutputStream(file)) {
@@ -50,21 +27,15 @@ public class DataStoreService {
             log.info("fail convert file");
         }
 
-        String finalUrl = getUploadObjectUrl(multipartFile.getOriginalFilename());
-        log.info("generated url: {}", finalUrl);
+        String url = buildUrl(multipartFile.getOriginalFilename(), bucketName);
+        log.info("generated url: {}", url);
         InputStream inputStream = new FileSystemResource(new File(file.getPath())).getInputStream();
         byte[] binaryData = IOUtils.toByteArray(inputStream);
-        HttpEntity<byte[]> requestEntity = new HttpEntity<>(binaryData, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(finalUrl, HttpMethod.POST, requestEntity, String.class);
-        /**/
-
-        return response.getBody();
+        return googleApiRestClient.makeApiCall(url, HttpMethod.POST, binaryData);
     }
 
-    private String getUploadObjectUrl(String fileName) {
-        return "https://storage.googleapis.com/upload/storage/v1/b/" + googleConsoleConfig.getBucketName() + "/o?uploadType=media&name=" + fileName;
+    private String buildUrl(String fileName, String bucketName) {
+        return "https://storage.googleapis.com/upload/storage/v1/b/" + bucketName + "/o?uploadType=media&name=" + fileName;
     }
 
 }
